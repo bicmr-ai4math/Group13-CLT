@@ -176,5 +176,7 @@ lemma charFun_of_add_indep (X : Ω → ℝ) (Y : Ω → ℝ) (_ℙ : Measure Ω)
     simp only [mul_add, add_mul, Complex.exp_add]
     apply IndepFun.integral_mul''
     sorry
+    sorry
+    sorry
 
 end ProbabilityTheory
