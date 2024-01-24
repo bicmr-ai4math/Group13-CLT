@@ -160,13 +160,21 @@ lemma norm_charFun_le_one (μ : Measure E) [IsProbabilityMeasure μ] (t : E) : �
   simp only [CstarRing.norm_one, integral_const, smul_eq_mul, mul_one, measure_univ, ENNReal.one_toReal]
 
 
-lemma charFun_ofvariable_lin (X : Ω → ℝ) (_ℙ : Measure Ω) (a b : ℝ) (t : ℝ)[NormedAddCommGroup Ω][NormedAddCommGroup ℝ](μ : Measure ℝ) [HasPDF X _ℙ μ]:
-    charFun_of (fun x => a * X x + b) _ℙ t = (charFun_of X _ℙ (t * a)) * exp (I * b * t) := by
+lemma charFun_ofvariable_lin (X : Ω → ℝ) (_ℙ : Measure Ω) (a b : ℝ) (t : ℝ)[NormedAddCommGroup Ω][NormedAddCommGroup ℝ](μ : Measure ℝ) [HasPDF X _ℙ μ]: charFun_of (fun x => a * X x + b) _ℙ t = (charFun_of X _ℙ (t * a)) * exp (I * b * t) := by
   simp [charFun_of, charFun_ofvariable, mul_add, add_mul, mul_assoc, exp_add]
+  rw [integral_mul_right]
+  congr 2
+  ring
+
+theorem IndepFun.integral_mul'' (X : Ω → ℂ) (Y : Ω → ℂ) (hXY : IndepFun X Y μ) (hX : AEStronglyMeasurable X μ)
+    (hY : AEStronglyMeasurable Y μ) : integral μ (X * Y) = integral μ X * integral μ Y := by
   sorry
 
 lemma charFun_of_add_indep (X : Ω → ℝ) (Y : Ω → ℝ) (_ℙ : Measure Ω) (t : ℝ) (indep : IndepFun X Y _ℙ):
     charFun_of (X + Y) _ℙ t = (charFun_of X _ℙ t) * (charFun_of Y _ℙ t) := by
+    simp [charFun_of]
+    simp only [mul_add, add_mul, Complex.exp_add]
+    apply IndepFun.integral_mul''
     sorry
 
 end ProbabilityTheory
