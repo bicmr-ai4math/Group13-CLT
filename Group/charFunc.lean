@@ -8,6 +8,7 @@ import Mathlib.Probability.Notation
 import Mathlib.Data.Real.NNReal
 import Mathlib.Probability.Density
 import Mathlib.MeasureTheory.Integral.SetIntegral
+import Mathlib.Analysis.Calculus.Deriv.Basic
 /-!
 # Characteristic function of a measure
 
@@ -114,7 +115,7 @@ def real_to_nnreal (x : ENNReal) : ℝ≥0 := ENNReal.toNNReal x
 noncomputable
 def gaussianPdf_nnreal (μ : ℝ)(v : ℝ≥0 ) (x : ℝ) : ℝ≥0 := real_to_nnreal (gaussianPdf μ v x)
 
--- one 'sorry' needed to be clear
+-- one 'sorry' needed to be clear,
 lemma gaussian_integral_var_change (μ : ℝ) (v : ℝ≥0 )(t : ℝ )(f : ℝ  → ℂ ) :
     ∫ (x : ℝ), f x ∂Gaussian_Distribution μ v = ∫ (x : ℝ), (f x) * (gaussianPdf μ v x) := by
   dsimp [Gaussian_Distribution]
@@ -128,7 +129,7 @@ lemma gaussian_integral_var_change (μ : ℝ) (v : ℝ≥0 )(t : ℝ )(f : ℝ  
   rw [NNReal.smul_def, Algebra.smul_def, mul_comm]
   simp
 
-
+-- lemma 4.9
 theorem charFun_GaussianDistribution (μ : ℝ) (v : ℝ≥0 )(t : ℝ ) : charFun (Gaussian_Distribution μ v) (t) = exp (μ * t * I - (v * t)^2 / 2) := by
   simp[charFun]
   rw[gaussian_integral_var_change μ v t (fun x => exp (↑t * ↑x * I))]
@@ -147,20 +148,21 @@ lemma charFun_eq_fourierIntegral_Euler (μ : Measure E) (t : E) (hf : Integrable
 lemma charFun_zero (μ : Measure E) [IsProbabilityMeasure μ] : charFun μ 0 = 1 := by
   simp only [charFun, inner_zero_left, zero_smul,exp_zero, integral_const, measure_univ,
   ENNReal.one_toReal, one_smul]
-
+--lemma 4.4
 lemma charFun_neg (μ : Measure E) (t : E) : charFun μ (-t) = conj (charFun μ t) := by
   simp [charFun, ← integral_conj, ← exp_conj, conj_ofReal]
 
 
-
+-- lemma 4.2
 lemma norm_charFun_le_one (μ : Measure E) [IsProbabilityMeasure μ] (t : E) : ‖charFun μ t‖ ≤ 1 := by
   rw [charFun_eq_fourierIntegral]
   refine (VectorFourier.norm_fourierIntegral_le_integral_norm _ _ _ _ _).trans_eq ?_
   --被积项的不等号
   simp only [CstarRing.norm_one, integral_const, smul_eq_mul, mul_one, measure_univ, ENNReal.one_toReal]
 
-
-lemma charFun_ofvariable_lin (X : Ω → ℝ) (_ℙ : Measure Ω) (a b : ℝ) (t : ℝ)[NormedAddCommGroup Ω][NormedAddCommGroup ℝ](μ : Measure ℝ) [HasPDF X _ℙ μ]: charFun_of (fun x => a * X x + b) _ℙ t = (charFun_of X _ℙ (t * a)) * exp (I * b * t) := by
+-- lemma 4.5
+lemma charFun_ofvariable_lin (X : Ω → ℝ) (_ℙ : Measure Ω) (a b : ℝ) (t : ℝ)[NormedAddCommGroup Ω][NormedAddCommGroup ℝ](μ : Measure ℝ) [HasPDF X _ℙ μ]:
+    charFun_of (fun x => a * X x + b) _ℙ t = (charFun_of X _ℙ (t * a)) * exp (I * b * t) := by
   simp [charFun_of, charFun_ofvariable, mul_add, add_mul, mul_assoc, exp_add]
   rw [integral_mul_right]
   congr 2
@@ -170,6 +172,7 @@ theorem IndepFun.integral_mul'' (X : Ω → ℂ) (Y : Ω → ℂ) (hXY : IndepFu
     (hY : AEStronglyMeasurable Y μ) : integral μ (X * Y) = integral μ X * integral μ Y := by
   sorry
 
+-- lemma 4.6
 lemma charFun_of_add_indep (X : Ω → ℝ) (Y : Ω → ℝ) (_ℙ : Measure Ω) (t : ℝ) (indep : IndepFun X Y _ℙ):
     charFun_of (X + Y) _ℙ t = (charFun_of X _ℙ t) * (charFun_of Y _ℙ t) := by
     simp [charFun_of]
@@ -179,6 +182,36 @@ lemma charFun_of_add_indep (X : Ω → ℝ) (Y : Ω → ℝ) (_ℙ : Measure Ω)
     sorry
     sorry
 
+-- lemma 4.8
+lemma difference_of_charFun (X : Ω → ℝ) (_ℙ : Measure Ω) (a b : ℝ):
+    ‖(charFun_of X _ℙ a) - (charFun_of X _ℙ b)‖ ≤ 2 * ∫ (x : Ω) , min |( s - t )*(X x)| 1 ∂_ℙ := by sorry
+
+
+-- below definitions are for lemma 5.1, including higher order derivs and a C to C version of charFun_of
+noncomputable
+def rpow_func (X : Ω → ℝ) (n : ℕ): Ω → ℝ := fun x => Real.rpow (X x) n
+noncomputable
+def cpow_func (X : Ω → ℂ) (n : ℕ): Ω → ℂ := fun x => Complex.cpow (X x) n
+
+noncomputable
+def deriv_func (f : ℂ → ℂ): ℂ → ℂ := fun x => deriv f x
+noncomputable
+def nth_deriv (f : ℂ → ℂ) (n : ℕ) (x : ℝ): ℂ := Nat.iterate (deriv_func f) n x
+
+noncomputable
+def charFun_of_CtoC (X : Ω → ℝ) (_ℙ : Measure Ω) (t : ℝ) : ℂ → ℂ :=
+  let _ : ℂ := Complex.mk t 0;
+  fun _ => ∫ (x : Ω), exp (⟪t, X x⟫ • I) ∂_ℙ
+
+def I_times_func (X :  Ω → ℝ) : Ω → ℂ := fun x => I * (X x)
+
+-- lemma 5.1
+lemma deriv_charFun (X : Ω → ℝ) (_ℙ : Measure Ω) (t : ℝ) (k n : ℕ)
+(n_mom_bd: ∃ c : ℝ, MeasureTheory.integral _ℙ  (rpow_func |X| n) ≤ c )(le: k ≤ n):
+    nth_deriv (charFun_of_CtoC X _ℙ t) k t =
+    MeasureTheory.integral _ℙ ((cpow_func (I_times_func X) k) * (fun x => exp (I * t * X x)))
+    := by
+    sorry
 
 
 end ProbabilityTheory
