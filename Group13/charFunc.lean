@@ -10,6 +10,7 @@ import Mathlib.Probability.Density
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Probability.Variance
+import Mathlib.Probability.Cdf
 /-!
 # Characteristic function of a measure
 
@@ -216,6 +217,7 @@ lemma deriv_charFun (X : Ω → ℝ) (_ℙ : Measure Ω) (t : ℝ) (k n : ℕ)
     nth_deriv (charFun_of_CtoC X _ℙ t) k t =
     MeasureTheory.integral _ℙ ((cpow_func (I_times_func X) k) * (fun x => exp (I * t * X x)))
     := by
+    dsimp [nth_deriv, charFun_of_CtoC]
     sorry
 
 --lemma 4.3
@@ -224,12 +226,27 @@ lemma charFun_continuous [Inner ℝ E] (X : Ω → E) (_ℙ : Measure Ω) (t : E
     dsimp [charFun_of]
     sorry
 
+--lemma 5.2 statement needed, should be easy
+
+
+--lemma 4.14 statement needed, its proof is dependent on the other files
+
+
+-- define convergence in distribution
+def ConvergesTo (s : ℕ → ℝ) (a : ℝ) :=
+  ∀ ε > 0, ∃ N, ∀ n ≥ N, |s n - a| < ε
+
+def converge_dis (X_seq : ℕ → (Ω → ℝ)) (_ℙ : Measure Ω) (Z: Ω → ℝ)
+(val_set: Set ℝ:= {x | ContinuousAt (ProbabilityTheory.cdf (Measure.map Z _ℙ)) x}) :=
+    ∀ x : val_set, ConvergesTo (fun i => (ProbabilityTheory.cdf (Measure.map (X_seq i) _ℙ) x)) (ProbabilityTheory.cdf (Measure.map Z _ℙ) x)
 -- CLT
 theorem CLT (X_seq : ℕ → (Ω → ℝ)) (_ℙ : Measure Ω) (Z: Ω → ℝ) (Z_law: Measure.map Z _ℙ = Gaussian_Distribution 0 1)
 (X_par: ℕ → Ω → ℝ:= fun n => (1 / Nat.sqrt n) * (Finset.sum (Finset.range n) (X_seq)))
 (iid: ∀ i j : ℕ, IndepFun (X_seq i) (X_seq j) _ℙ ∧ Measure.map (X_seq i) _ℙ = Measure.map (X_seq j) _ℙ)
 (X_seq_prop: ∀ i : ℕ, MeasureTheory.integral _ℙ (X_seq i) = 0 ∧ ProbabilityTheory.variance (X_seq i) _ℙ = 1):
-    1 = 1 := by
-    sorry  -- need to fill in 'X_par converges to Z in distribution' as the goal
+    converge_dis (X_par) _ℙ Z:= by
+    dsimp [converge_dis, ConvergesTo]
+    intro x ε
+    sorry  -- need 4.5, 4.6. 4.14, and 5.2
 
 end ProbabilityTheory
