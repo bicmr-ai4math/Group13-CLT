@@ -9,6 +9,7 @@ import Mathlib.Data.Real.NNReal
 import Mathlib.Probability.Density
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Probability.Variance
 /-!
 # Characteristic function of a measure
 
@@ -213,5 +214,18 @@ lemma deriv_charFun (X : Ω → ℝ) (_ℙ : Measure Ω) (t : ℝ) (k n : ℕ)
     := by
     sorry
 
+--lemma 4.3
+lemma charFun_continuous [Inner ℝ E] (X : Ω → E) (_ℙ : Measure Ω) (t : E):
+    Continuous fun t => charFun_of X _ℙ t:= by
+    dsimp [charFun_of]
+    sorry
+
+-- CLT
+theorem CLT (X_seq : ℕ → (Ω → ℝ)) (_ℙ : Measure Ω) (Z: Ω → ℝ) (Z_law: Measure.map Z _ℙ = Gaussian_Distribution 0 1)
+(X_par: ℕ → Ω → ℝ:= fun n => (1 / Nat.sqrt n) * (Finset.sum (Finset.range n) (X_seq)))
+(iid: ∀ i j : ℕ, IndepFun (X_seq i) (X_seq j) _ℙ ∧ Measure.map (X_seq i) _ℙ = Measure.map (X_seq j) _ℙ)
+(X_seq_prop: ∀ i : ℕ, MeasureTheory.integral _ℙ (X_seq i) = 0 ∧ ProbabilityTheory.variance (X_seq i) _ℙ = 1):
+    1 = 1 := by
+    sorry  -- need to fill in 'X_par converges to Z in distribution' as the goal
 
 end ProbabilityTheory
