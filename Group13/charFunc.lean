@@ -77,7 +77,7 @@ open Set BigOperators NNReal
 namespace ProbabilityTheory
 
 variable {E : Type*} [MeasurableSpace E]
-variable {Ω : Type*} [MeasurableSpace Ω]
+variable {Ω : Type*} [MeasurableSpace Ω] (_ℙ : Measure Ω) [MeasureSpace Ω]
 
 /-- The characteristic function of a measure. -/
 noncomputable
@@ -185,7 +185,11 @@ lemma charFun_of_add_indep (X : Ω → ℝ) (Y : Ω → ℝ) (_ℙ : Measure Ω)
 
 -- lemma 4.8
 lemma difference_of_charFun (X : Ω → ℝ) (_ℙ : Measure Ω) (a b : ℝ):
-    ‖(charFun_of X _ℙ a) - (charFun_of X _ℙ b)‖ ≤ 2 * ∫ (x : Ω) , min |( s - t )*(X x)| 1 ∂_ℙ := by sorry
+    ‖(charFun_of X _ℙ a) - (charFun_of X _ℙ b)‖ ≤ 2 * ∫ (x : Ω) , min |( s - t )*(X x)| 1 ∂_ℙ := by
+    simp [charFun_of]
+    have h₁ : MeasureTheory.Integrable (fun x => cexp (↑a * ↑(X x) * I)) := by sorry
+    have h₂ : MeasureTheory.Integrable (fun x => cexp (↑b * ↑(X x) * I)) := by sorry
+    sorry
 
 
 -- below definitions are for lemma 5.1, including higher order derivs and a C to C version of charFun_of
