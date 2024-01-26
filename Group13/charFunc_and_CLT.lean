@@ -247,6 +247,6 @@ theorem CLT (X_seq : ℕ → (Ω → ℝ)) (_ℙ : Measure Ω) (Z: Ω → ℝ) (
     converge_dis (X_par) _ℙ Z:= by
     dsimp [converge_dis, ConvergesTo]
     intro x ε
-    sorry  -- need 4.5, 4.6. 4.14, and 5.2
+    sorry  -- use 4.5, 4.6, (unfinished:) 4.14, and 5.2
 
 end ProbabilityTheory
